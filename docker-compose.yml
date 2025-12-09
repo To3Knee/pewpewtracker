@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # SERVICE 1: The Anti-Bot Proxy
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+    ports:
+      - "8191:8191" # Exposes the proxy if you want to test it manually
+    restart: unless-stopped
+
+  # SERVICE 2: Your Reloading Dashboard
+  app:
+    build: .
+    container_name: reload_dashboard
+    ports:
+      - "8501:8501" # The port you will open in your browser
+    environment:
+      - SOLVER_URL=http://flaresolverr:8191/v1
+    depends_on:
+      - flaresolverr
+    volumes:
+      - .:/app # Allows you to edit code without rebuilding
+    restart: always
